@@ -14,6 +14,7 @@ flatten_payload AS (
 ),
 flatten_payload_1 as (
     SELECT
+        row_number() OVER (ORDER BY NotificationId) AS s_no,
         NotificationId,
         offers.value:"LandedPrice"::Object:"Amount"::FLOAT as LandedPriceAmount,
         offers.value:"LandedPrice"::Object:"CurrencyCode"::STRING as LandedCurrencyCode,

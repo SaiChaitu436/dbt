@@ -10,8 +10,11 @@ flatten_payload as (
     from source_data
 ),
 flatten_offers as (
-    select NotificationId, ASIN, 
+    select 
+    row_number() OVER (ORDER BY NotificationId, ASIN) AS s_no,
     row_number() over(partition by asin order by NotificationId desc) as OfferID,
+    ASIN,
+    NotificationId,
     offers.value:"SellerId"::STRING as SellerId,
     offers.value:"IsBuyBoxWinner"::STRING as IsBuyBoxWinner,
     offers.value:"ListingPrice"::OBJECT:"Amount"::FLOAT as ListingPriceAmount,
@@ -24,4 +27,4 @@ flatten_offers as (
 )
 SELECT
     *
-FROM flatten_offers
+FROM flatten_offers order by s_no

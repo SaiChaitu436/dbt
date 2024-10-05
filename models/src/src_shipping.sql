@@ -11,11 +11,12 @@ flatten_payload as (
 
 flatten_data as (
     SELECT
+    row_number() OVER (ORDER BY NotificationId) AS s_no,
     NotificationId,
     offers.value:"Shipping"::OBJECT:"Amount"::INTEGER as ShippingAmount,
     offers.value:"Shipping"::OBJECT:"CurrencyCode"::STRING as ShippingCurrencyCode,
     offers.value:"ShippingTime"::OBJECT:"AvailabilityType"::STRING as ShippingAvailabilityType,
-    offers.value:"ShippingTime"::OBJECT:"AvailableDate"::STRING as ShippingAvailabilityDate,
+    -- offers.value:"ShippingTime"::OBJECT:"AvailableDate"::STRING as ShippingAvailabilityDate,
     offers.value:"ShippingTime"::OBJECT:"MaximumHours"::FLOAT as ShippingMaximumHours,
     offers.value:"ShippingTime"::OBJECT:"MinimumHours"::FLOAT as ShippingMinimumHours,
     offers.value:"ShipsDomestically"::BOOLEAN as ShipsDomestically,
