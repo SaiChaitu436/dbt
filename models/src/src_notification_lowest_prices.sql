@@ -13,6 +13,7 @@ flatten_payload AS (
 ),
 flatten_payload_1 as (
     SELECT
+        row_number() OVER (ORDER BY NotificationId) AS s_no,
         NotificationId,
         offers.value:"Condition"::STRING as Condition,
         offers.value:"FulfillmentChannel"::STRING as FulFillmentChannel,

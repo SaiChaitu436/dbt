@@ -6,25 +6,25 @@ WITH source_data AS (
 ),
 flatten_payload AS (
     SELECT 
-        raw_data:"Payload"::OBJECT:"AnyOfferChangedNotification"::OBJECT:"Summary"::OBJECT:"NumberOfOffers"::ARRAY as offer,
-        raw_data:"Payload"::OBJECT:"AnyOfferChangedNotification"::OBJECT:"Summary"::OBJECT:"NumberOfBuyBoxEligibleOffers"::ARRAY as offers
+        raw_data:"Payload"::OBJECT:"AnyOfferChangedNotification"::OBJECT:"Summary"::OBJECT:"NumberOfOffers"::ARRAY AS offer,
+        raw_data:"Payload"::OBJECT:"AnyOfferChangedNotification"::OBJECT:"Summary"::OBJECT:"NumberOfBuyBoxEligibleOffers"::ARRAY AS offers
     FROM    
         source_data
 ),
-flatten_payload_1 as (
+flatten_payload_1 AS (
     SELECT
-        offers.value:"Condition"::STRING as EligibleOfferCondition,
-        offers.value:"FulfillmentChannel"::STRING as EligibleFulFillmentChannel,
-        offers.value:"OfferCount"::STRING as EligibleOfferCount,
+        ROW_NUMBER() OVER (ORDER BY offers.value:"Condition"::STRING) AS s_no,
+        offers.value:"Condition"::STRING AS EligibleOfferCondition,
+        offers.value:"FulfillmentChannel"::STRING AS EligibleFulFillmentChannel,
+        offers.value:"OfferCount"::STRING AS EligibleOfferCount,
         
-        offer.value:"Condition"::STRING as NumberOfferCondition,
-        offer.value:"FulfillmentChannel"::STRING as NumberFulFillmentChannel,
-        offer.value:"OfferCount"::STRING as NumberOfferCount,
-
-        
-        from flatten_payload, 
-        lateral flatten(input=>flatten_payload.offer) as offer,
-        lateral flatten(input=>flatten_payload.offers) as offers
+        offer.value:"Condition"::STRING AS NumberOfferCondition,
+        offer.value:"FulfillmentChannel"::STRING AS NumberFulFillmentChannel,
+        offer.value:"OfferCount"::STRING AS NumberOfferCount
+    FROM 
+        flatten_payload, 
+        LATERAL FLATTEN(input => flatten_payload.offer) AS offer,
+        LATERAL FLATTEN(input => flatten_payload.offers) AS offers
 )
 SELECT * 
 FROM flatten_payload_1

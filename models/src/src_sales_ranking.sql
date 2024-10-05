@@ -14,6 +14,7 @@ flatten_payload AS (
 ),
 flatten_payload_1 as (
     SELECT
+        row_number() over (order by offer.value:"ProductCategoryId") as s_no,
         offer.value:"ProductCategoryId"::STRING as ProductCategoryId,
         offer.value:"Rank"::STRING as Ranking
         from flatten_payload, 
